@@ -12,7 +12,7 @@ const ResetPasswordPage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  const API_URL = 'http://127.0.0.1:8000/api/v1';
+  const API_URL = 'https://jutt278.pythonanywhere.com/api/v1';
 
   const handleChange = (e) => {
     setFormData({

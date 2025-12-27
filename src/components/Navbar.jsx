@@ -5,10 +5,15 @@ import { AuthContext } from '../context/AuthContext';
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
+  const BACKEND_URL = 'https://jutt278.pythonanywhere.com';
 
   // Get user profile picture or use placeholder
   const userProfilePic =
-    user?.profile?.profile_picture ||
+    (user?.profile?.profile_picture
+      ? user.profile.profile_picture.startsWith('http')
+        ? user.profile.profile_picture
+        : `${BACKEND_URL}${user.profile.profile_picture}`
+      : null) ||
     'https://ui-avatars.com/api/?name=' +
       (user?.username || 'User') +
       '&background=6366f1&color=fff&size=128';

@@ -3,6 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 
 const ProfilePage = () => {
   const { user, updateProfile, refetchProfile } = useContext(AuthContext);
+  const BACKEND_URL = 'https://jutt278.pythonanywhere.com';
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -27,7 +28,10 @@ const ProfilePage = () => {
       });
 
       if (user.profile?.profile_picture) {
-        setPreviewUrl(user.profile.profile_picture);
+        const pictureUrl = user.profile.profile_picture.startsWith('http')
+          ? user.profile.profile_picture
+          : `${BACKEND_URL}${user.profile.profile_picture}`;
+        setPreviewUrl(pictureUrl);
       }
     }
   }, [user]);
@@ -123,7 +127,11 @@ const ProfilePage = () => {
                 <img
                   src={
                     previewUrl ||
-                    user?.profile?.profile_picture ||
+                    (user?.profile?.profile_picture
+                      ? user.profile.profile_picture.startsWith('http')
+                        ? user.profile.profile_picture
+                        : `${BACKEND_URL}${user.profile.profile_picture}`
+                      : null) ||
                     `https://ui-avatars.com/api/?name=${user?.username}&background=6366f1&color=fff&size=256`
                   }
                   alt={user.username}

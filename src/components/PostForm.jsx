@@ -10,7 +10,6 @@ const PostForm = ({
 }) => {
   const { fetchCategories, loading } = useContext(PostContext);
   const [categories, setCategories] = useState([]);
-  const CLOUD_URL = 'https://res.cloudinary.com/dtxh9hjpd/';
 
   //  Fetch Categories from backend
   useEffect(() => {
@@ -40,7 +39,7 @@ const PostForm = ({
         category: initialData.category?.id || initialData.category || '',
       });
       if (initialData.image) {
-        setExistingImageUrl(`${CLOUD_URL}${initialData.image}`);
+        setExistingImageUrl(initialData.image);
       }
     }
   }, [editMode, initialData]);

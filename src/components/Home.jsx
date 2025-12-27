@@ -6,7 +6,6 @@ import { PostContext } from '../context/PostContext';
 import Loading from './Loading';
 const Home = () => {
   const { user } = useContext(AuthContext);
-  const CLOUD_URL = 'https://res.cloudinary.com/dtxh9hjpd/';
   const { posts, fetchPosts, loading, deletePost } = useContext(PostContext);
 
   // State for delete confirmation modal
@@ -63,7 +62,7 @@ const Home = () => {
               <div className="h-48 sm:h-56 overflow-hidden cursor-pointer relative">
                 <Link to={`/postdetail/${post.slug}`}>
                   <img
-                    src={post.image ? `${CLOUD_URL}${post.image}` : placeholder}
+                    src={post.image || placeholder}
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />

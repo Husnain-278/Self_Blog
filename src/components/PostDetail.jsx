@@ -4,7 +4,6 @@ import placeholder from '../assets/placeholder.webp';
 import { PostContext } from '../context/PostContext';
 import Loading from './Loading';
 const PostDetail = () => {
-  const CLOUD_URL = 'https://res.cloudinary.com/dtxh9hjpd/';
   const { slug } = useParams();
   const { fetchPostById, loading, currentPost } = useContext(PostContext);
   useEffect(() => {
@@ -24,7 +23,7 @@ const PostDetail = () => {
           {currentPost.image != null && (
             <div className="w-full h-64 sm:h-96 overflow-hidden">
               <img
-                src={`${CLOUD_URL}${currentPost.image}`}
+                src={currentPost.image}
                 alt={currentPost.title}
                 className="w-full h-full object-cover"
               />
