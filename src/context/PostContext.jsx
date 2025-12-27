@@ -11,7 +11,7 @@ export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState(null);
   const [error, setError] = useState(null);
-  const API_URL = 'http://127.0.0.1:8000/api/v1';
+  const API_URL = 'https://jutt278.pythonanywhere.com/api/v1';
 
   const fetchPosts = async () => {
     if (!accessToken) return { success: false, error: 'Authentication failed' };

@@ -57,10 +57,6 @@ const ProfilePage = () => {
     setLoading(true);
     setMessage({ type: '', text: '' });
 
-    console.log('Form submitted');
-    console.log('Form data:', formData);
-    console.log('Profile picture:', profilePicture);
-
     const data = new FormData();
     data.append('first_name', formData.first_name);
     data.append('last_name', formData.last_name);
@@ -71,14 +67,7 @@ const ProfilePage = () => {
       data.append('profile_picture', profilePicture);
     }
 
-    console.log('FormData entries:');
-    for (let [key, value] of data.entries()) {
-      console.log(key, value);
-    }
-
     const result = await updateProfile(data);
-
-    console.log('Update result:', result);
 
     if (result.success) {
       setMessage({ type: 'success', text: 'Profile updated successfully!' });

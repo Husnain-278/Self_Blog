@@ -14,22 +14,19 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = 'http://127.0.0.1:8000/api/v1';
+  const API_URL = 'https://jutt278.pythonanywhere.com/api/v1';
 
   // 🔹 Fetch user profile
   const fetchUserProfile = async (token) => {
     try {
-      console.log('Fetching user profile with token:', token);
       const response = await axios.get(`${API_URL}/profile/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('User profile fetched:', response.data);
       setUser(response.data);
       setIsAuthenticated(true);
     } catch (error) {
-      console.log('Failed to fetch user profile:', error);
       logout();
     }
   };
@@ -98,9 +95,6 @@ export const AuthProvider = ({ children }) => {
   // 🔹 Update profile
   const updateProfile = async (formData) => {
     try {
-      console.log('Updating profile with data:', formData);
-      console.log('Access token:', accessToken);
-
       const response = await axios.put(`${API_URL}/profile/`, formData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -108,13 +102,9 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
-      console.log('Profile update response:', response.data);
       setUser(response.data);
       return { success: true, data: response.data };
     } catch (error) {
-      console.error('Profile update error:', error);
-      console.error('Error response:', error.response);
-
       const data = error.response?.data;
       let message = 'Profile update failed';
       if (data) {
@@ -151,7 +141,6 @@ export const AuthProvider = ({ children }) => {
 
       return newAccessToken;
     } catch (error) {
-      console.log('Token refresh failed:', error);
       logout();
       return null;
     }

@@ -6,10 +6,6 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Debug: log user data
-  console.log('Navbar - User data:', user);
-  console.log('Navbar - Profile picture:', user?.profile?.profile_picture);
-
   // Get user profile picture or use placeholder
   const userProfilePic =
     user?.profile?.profile_picture ||
