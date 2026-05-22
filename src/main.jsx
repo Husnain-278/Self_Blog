@@ -6,11 +6,11 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import { PostProvider } from './context/PostContext.jsx';
 
 createRoot(document.getElementById('root')).render(
-  <AuthProvider>
-    <PostProvider>
-      <BrowserRouter>
+  <BrowserRouter>
+    <AuthProvider>
+      <PostProvider>
         <App />
-      </BrowserRouter>
-    </PostProvider>
-  </AuthProvider>
+      </PostProvider>
+    </AuthProvider>
+  </BrowserRouter>
 );

@@ -9,22 +9,33 @@ export const PostProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [categories, setCategories] = useState(null);
   const [error, setError] = useState(null);
-  const API_URL = 'https://jutt278.pythonanywhere.com/api/v1';
+  const API_URL = 'http://127.0.0.1:8000/api/v1';
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (page = 1) => {
     if (!accessToken) return { success: false, error: 'Authentication failed' };
     setError(null);
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/post-list/`, {
+      const response = await axios.get(`${API_URL}/post-list/?page=${page}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      setPosts(response.data.results);
-      return { success: true, data: response.data.results };
+      const results = response.data.results || [];
+      const count = response.data.count ?? results.length;
+      const pageSize = 10; // server uses PostPagination page_size = 10
+
+      setPosts(results);
+      setCurrentPage(page);
+      setTotalCount(count);
+      setTotalPages(Math.max(1, Math.ceil(count / pageSize)));
+
+      return { success: true, data: results };
     } catch (error) {
       setError(error.response?.data?.detail || 'failed to fetch posts');
       return { success: false, error: error.message };
@@ -144,6 +155,9 @@ export const PostProvider = ({ children }) => {
     loading,
     posts,
     currentPost,
+    currentPage,
+    totalPages,
+    totalCount,
     categories,
     error,
     fetchPosts,

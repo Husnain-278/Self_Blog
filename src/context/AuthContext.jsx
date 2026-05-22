@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { createContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(
     localStorage.getItem('accessToken')
@@ -14,7 +16,8 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = 'https://jutt278.pythonanywhere.com/api/v1';
+  const API_URL = 'http://127.0.0.1:8000/api/v1';
+  const isTokenEndpoint = (url = '') => url.includes('/token/');
 
   // 🔹 Fetch user profile
   const fetchUserProfile = async (token) => {
@@ -90,6 +93,7 @@ export const AuthProvider = ({ children }) => {
     setAccessToken(null);
     setRefreshToken(null);
     setIsAuthenticated(false);
+    navigate('/login', { replace: true });
   };
 
   // 🔹 Update profile
@@ -146,37 +150,79 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // 🔹 Init auth on load
+  // 🔹 Axios interceptors (attach token, refresh with single-flight and queue)
   useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (token) await fetchUserProfile(token);
-      setLoading(false);
-    };
-    initAuth();
-  }, []);
+    let isRefreshing = false;
+    let failedQueue = [];
 
-  // 🔹 Axios interceptors
-  useEffect(() => {
+    const processQueue = (error, token = null) => {
+      failedQueue.forEach((prom) => {
+        if (error) prom.reject(error);
+        else prom.resolve(token);
+      });
+      failedQueue = [];
+    };
+
     const requestIntercept = axios.interceptors.request.use((config) => {
-      if (accessToken && !config.headers.Authorization) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
+      const requestUrl = config.url || '';
+      if (!isTokenEndpoint(requestUrl)) {
+        const token = localStorage.getItem('accessToken') || accessToken;
+        if (token && !config.headers.Authorization) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
       }
       return config;
     });
 
     const responseIntercept = axios.interceptors.response.use(
       (response) => response,
-      async (error) => {
+      (error) => {
         const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
-          const newToken = await refreshAccessToken();
-          if (newToken) {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return axios(originalRequest);
+        const requestUrl = originalRequest?.url || '';
+
+        if (
+          error.response?.status === 401 &&
+          originalRequest &&
+          !originalRequest._retry &&
+          !isTokenEndpoint(requestUrl)
+        ) {
+          if (isRefreshing) {
+            return new Promise((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            })
+              .then((token) => {
+                originalRequest.headers.Authorization = `Bearer ${token}`;
+                return axios(originalRequest);
+              })
+              .catch((err) => Promise.reject(err));
           }
+
+          originalRequest._retry = true;
+          isRefreshing = true;
+
+          return new Promise(async (resolve, reject) => {
+            try {
+              const newToken = await refreshAccessToken();
+              if (!newToken) {
+                throw new Error('Unable to refresh token');
+              }
+              processQueue(null, newToken);
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              resolve(axios(originalRequest));
+            } catch (err) {
+              processQueue(err, null);
+              logout();
+              reject(err);
+            } finally {
+              isRefreshing = false;
+            }
+          });
         }
+
+        if (error.response?.status === 401 && originalRequest && isTokenEndpoint(requestUrl)) {
+          return Promise.reject(error);
+        }
+
         return Promise.reject(error);
       }
     );
@@ -186,6 +232,16 @@ export const AuthProvider = ({ children }) => {
       axios.interceptors.response.eject(responseIntercept);
     };
   }, [accessToken, refreshToken]);
+
+  // 🔹 Init auth on load
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (token) await fetchUserProfile(token);
+      setLoading(false);
+    };
+    initAuth();
+  }, []);
 
   const contextValue = {
     user,

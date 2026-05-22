@@ -44,6 +44,13 @@ const PostForm = ({
     }
   }, [editMode, initialData]);
 
+  // Keep description in sync when in edit mode
+  useEffect(() => {
+    if (editMode && initialData) {
+      setFormData((prev) => ({ ...prev, description: initialData.description || '' }));
+    }
+  }, [editMode, initialData]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -133,18 +140,20 @@ const PostForm = ({
               >
                 Description <span className="text-red-500">*</span>
               </label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Write your post content here..."
-                rows="8"
-                required
-                className="appearance-none block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none"
-              />
+                      <div>
+                        <textarea
+                          id="description"
+                          name="description"
+                          value={formData.description}
+                          onChange={handleChange}
+                          placeholder="Write your post content here..."
+                          rows={8}
+                          required
+                          className="appearance-none block w-full px-4 py-3 border border-gray-300 placeholder-gray-400 text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none"
+                        />
+                      </div>
               <p className="mt-2 text-sm text-gray-500">
-                {formData.description.length} characters
+                {formData.description.replace(/<[^>]*>/g, '').length} characters
               </p>
             </div>
 

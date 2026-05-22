@@ -3,6 +3,21 @@ import { Link, useParams } from 'react-router-dom';
 import placeholder from '../assets/placeholder.webp';
 import { PostContext } from '../context/PostContext';
 import Loading from './Loading';
+
+const POST_IMAGE_BASE_URL =
+  'http://res.cloudinary.com/dtxh9hjpd';
+
+const getPostImageUrl = (image) => {
+  if (!image) {
+    return placeholder;
+  }
+
+  if (image.startsWith('http://') || image.startsWith('https://')) {
+    return image;
+  }
+
+  return `${POST_IMAGE_BASE_URL}/${image.replace(/^\/+/, '')}`;
+};
 const PostDetail = () => {
   const { slug } = useParams();
   const { fetchPostById, loading, currentPost } = useContext(PostContext);
@@ -23,7 +38,7 @@ const PostDetail = () => {
           {currentPost.image != null && (
             <div className="w-full h-64 sm:h-96 overflow-hidden">
               <img
-                src={currentPost.image}
+                src={getPostImageUrl(currentPost.image)}
                 alt={currentPost.title}
                 className="w-full h-full object-cover"
               />
@@ -32,7 +47,7 @@ const PostDetail = () => {
           {currentPost.image == null && (
             <div className="w-full h-64 sm:h-96 overflow-hidden">
               <img
-                src={placeholder}
+                src={getPostImageUrl(null)}
                 alt={currentPost.title}
                 className="w-full h-full object-cover"
               />
