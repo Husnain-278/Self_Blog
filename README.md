@@ -1,16 +1,67 @@
-# React + Vite
+# Self_Blog — Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend application for the SelfBlog project. Built with React and Vite, it provides the UI for viewing, creating, editing posts, and user authentication.
 
-Currently, two official plugins are available:
+## Contents
+- `src/` — React source files
+- `public/` — static assets
+- `.env` — Vite environment variables (not committed; see example below)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Prerequisites
+- Node.js 18+ and npm
+- Backend API running (see `backend_self_blog`)
 
-## React Compiler
+## Setup
+1. Install dependencies
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+cd Self_Blog
+npm install --legacy-peer-deps
+```
 
-## Expanding the ESLint configuration
+2. Create `.env` in the `Self_Blog` folder (example variables):
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```
+VITE_API_URL=http://127.0.0.1:8000/api/v1
+VITE_FRONTEND_URL=http://localhost:5173
+# Optional: Cloudinary client keys (use carefully)
+VITE_CLOUDINARY_CLOUD_NAME=your_cloud_name
+```
+
+3. Start dev server
+
+```bash
+npm run dev
+```
+
+Open the printed URL (default http://localhost:5173 or another port if 5173 is in use).
+
+## Build
+
+```bash
+npm run build
+```
+
+Serve the `dist/` output with your preferred static host or integrate into your backend deployment.
+
+## Environment variables
+- Use `VITE_` prefix for environment variables exposed to the client. Access them via `import.meta.env.VITE_API_URL`.
+
+## Notes about the backend
+- The frontend expects the Django backend (in `backend_self_blog`) to provide REST endpoints under `/api/v1` including token auth endpoints (`/token/`, `/token/refresh/`), profiles, posts, and categories.
+- Ensure CORS and CSRF settings on the backend allow requests from the frontend origin.
+
+## Common commands
+- `npm run dev` — start development server
+- `npm run build` — create production build
+- `npm run preview` — locally preview build
+
+## Troubleshooting
+- If you encounter peer dependency errors when installing, use `npm install --legacy-peer-deps`.
+- If the frontend cannot reach the backend, verify `VITE_API_URL` and backend CORS.
+
+## Contributing
+Open a PR with changes to `src/` and include a description of your change and testing steps.
+
+---
+Update this README with any project-specific details you want to preserve.
